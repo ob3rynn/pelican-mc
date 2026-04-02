@@ -1,16 +1,28 @@
 #!/bin/bash
+set -euo pipefail
 
 echo "Starting Pelican MC..."
 
-PLAN_TYPE=${PLAN_TYPE:-2GB}
+# Defaults
+PLAN_TYPE="${PLAN_TYPE:-2GB}"
+SERVER_MEMORY="${SERVER_MEMORY:-2048}"
 
-if [ "$PLAN_TYPE" = "2GB" ]; then
-  VIEW_DISTANCE=6
-  SIM_DISTANCE=5
-elif [ "$PLAN_TYPE" = "4GB" ]; then
-  VIEW_DISTANCE=10
-  SIM_DISTANCE=8
-fi
+# Tier logic
+case "$PLAN_TYPE" in
+  "2GB")
+    VIEW_DISTANCE=6
+    SIM_DISTANCE=5
+    ;;
+  "4GB")
+    VIEW_DISTANCE=10
+    SIM_DISTANCE=8
+    ;;
+  *)
+    echo "WARNING: Unknown PLAN_TYPE '$PLAN_TYPE', defaulting to 2GB settings"
+    VIEW_DISTANCE=6
+    SIM_DISTANCE=5
+    ;;
+esac
 
 echo "Plan: $PLAN_TYPE"
 
@@ -20,28 +32,29 @@ if [ ! -f server.properties ]; then
   touch server.properties
 fi
 
-# Function to set or update a property
+# Function to set or update a property safely
 set_property() {
-  KEY=$1
-  VALUE=$2
+  local KEY="$1"
+  local VALUE="$2"
 
-  if grep -q "^$KEY=" server.properties; then
-    sed -i "s/^$KEY=.*/$KEY=$VALUE/" server.properties
+  if grep -q "^${KEY}=" server.properties; then
+    sed -i "s/^${KEY}=.*/${KEY}=${VALUE}/" server.properties
   else
-    echo "$KEY=$VALUE" >> server.properties
+    echo "${KEY}=${VALUE}" >> server.properties
   fi
 }
 
-# Enforce settings
+# Enforce controlled settings
 set_property "view-distance" "$VIEW_DISTANCE"
 set_property "simulation-distance" "$SIM_DISTANCE"
 
-# Ensure server jar exists (placeholder for now)
+# Ensure server jar exists
 if [ ! -f server.jar ]; then
-  echo "No server.jar found (placeholder)."
-  touch server.jar
+  echo "ERROR: server.jar not found"
+  exit 1
 fi
 
 echo "Using memory: ${SERVER_MEMORY}M"
 
-java -Xms${SERVER_MEMORY}M -Xmx${SERVER_MEMORY}M -jar server.jar nogui
+# Start server (exec ensures proper signal handling)
+exec java -Xms${SERVER_MEMORY}M -Xmx${SERVER_MEMORY}M -jar server.jar nogui
