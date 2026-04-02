@@ -14,8 +14,8 @@ case "$PLAN_TYPE" in
     SIM_DISTANCE=5
     ;;
   "4GB")
-    VIEW_DISTANCE=10
-    SIM_DISTANCE=8
+    VIEW_DISTANCE=8
+    SIM_DISTANCE=6
     ;;
   *)
     echo "WARNING: Unknown PLAN_TYPE '$PLAN_TYPE', defaulting to 2GB settings"
