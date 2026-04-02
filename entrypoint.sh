@@ -54,7 +54,11 @@ if [ ! -f server.jar ]; then
   exit 1
 fi
 
-echo "Using memory: ${SERVER_MEMORY}M"
+# Resolve JVM heap (fallback to SERVER_MEMORY if not explicitly set)
+JVM_MEMORY="${JVM_MEMORY:-${SERVER_MEMORY}}"
+
+echo "Container memory: ${SERVER_MEMORY}M"
+echo "JVM heap: ${JVM_MEMORY}M"
 
 # Start server (exec ensures proper signal handling)
-exec java -Xms${SERVER_MEMORY}M -Xmx${SERVER_MEMORY}M -jar server.jar nogui
+exec java -Xms${JVM_MEMORY}M -Xmx${JVM_MEMORY}M -jar server.jar nogui
