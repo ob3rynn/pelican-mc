@@ -14,9 +14,29 @@ fi
 
 echo "Plan: $PLAN_TYPE"
 
-echo "view-distance=$VIEW_DISTANCE" > server.properties
-echo "simulation-distance=$SIM_DISTANCE" >> server.properties
+# Ensure server.properties exists
+if [ ! -f server.properties ]; then
+  echo "server.properties not found, creating..."
+  touch server.properties
+fi
 
+# Function to set or update a property
+set_property() {
+  KEY=$1
+  VALUE=$2
+
+  if grep -q "^$KEY=" server.properties; then
+    sed -i "s/^$KEY=.*/$KEY=$VALUE/" server.properties
+  else
+    echo "$KEY=$VALUE" >> server.properties
+  fi
+}
+
+# Enforce settings
+set_property "view-distance" "$VIEW_DISTANCE"
+set_property "simulation-distance" "$SIM_DISTANCE"
+
+# Ensure server jar exists (placeholder for now)
 if [ ! -f server.jar ]; then
   echo "No server.jar found (placeholder)."
   touch server.jar
