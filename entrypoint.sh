@@ -54,6 +54,9 @@ if [ ! -f server.jar ]; then
   exit 1
 fi
 
-echo "CMD: $@"
-exec "$@"
-#exec "$@"
+if [ "$#" -eq 0 ]; then
+  echo "No CMD args detected, using STARTUP variable"
+  exec /bin/sh -c "$STARTUP"
+else
+  exec "$@"
+fi
