@@ -1,13 +1,7 @@
-FROM ghcr.io/pterodactyl/yolks:java_17
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE}
 
-USER root
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
-WORKDIR /home/container
-
-COPY entrypoint.sh ./entrypoint.sh
-
-RUN chmod +x ./entrypoint.sh
-
-USER container
-
-ENTRYPOINT ["./entrypoint.sh"]
+ENTRYPOINT ["/entrypoint.sh"]
