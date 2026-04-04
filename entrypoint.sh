@@ -54,4 +54,6 @@ if [ ! -f server.jar ]; then
   exit 1
 fi
 
+echo "CMD: $@"
 exec "$@"
+#exec "$@"
