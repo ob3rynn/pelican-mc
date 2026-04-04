@@ -54,9 +54,10 @@ if [ ! -f server.jar ]; then
   exit 1
 fi
 
-if [ "$#" -eq 0 ]; then
-  echo "No CMD args detected, using STARTUP variable"
-  exec /bin/sh -c "$STARTUP"
+if [ -n "${SERVER_MEMORY}" ]; then
+    echo "Setting Java heap to $((SERVER_MEMORY - 400))M"
 else
-  exec "$@"
+    echo "MEMORY ERROR"
 fi
+
+exec /bin/sh -c "$STARTUP"
